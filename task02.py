@@ -79,7 +79,6 @@ num = get_simple_number(n)
 print("Время не Эр.:", timeit.timeit(s,number=50,globals=globals()))
 
 
-########################
 # cProfile
 print("Оценка Эратосвена через cProfile")
 cProfile.run("get_simple_number_erato(n)")
