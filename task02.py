@@ -7,46 +7,13 @@
 # Вариант №1
 # Классический алгоритм Решето Эратосфена
 
-def get_simple_number_erato1(n):
-    #Функция прокалывает дырки
-    def prokalyvaem_dyrki(arr, n): # передаем масив и простое число
-        start_search = n*2
-        for inx,digit in enumerate(arr[start_search::n],n):
-            for inx, digit in enumerate(arr[start_search::n], n):
-                full_inx = arr.index(digit)
-                if arr[full_inx] != 0:  # если он не равен нулю, то
-                    arr[full_inx] = 0
-        return arr
-
-    lst = []
-    arr = []
-    arr.append(0); arr.append(0)   # заполняем первый и второй нулями
-    while len(lst) != n:
-        arr.append(len(arr))
-        for inx,a in enumerate(arr[2:], 2):
-            if arr[inx] != 0:  # если он не равен нулю, то мы нашли простое число и:
-                prokalyvaem_dyrki(arr, a)
-        lst = [x for x in arr if x != 0]
-
-    return lst[-1]
-
-
-
-# Вариант №2
-# Оптимизированный алгоритм Решето Эратосфена
-# Начинаем попроверять не с n*2, а с n**2
-
-
-
-def get_simple_number_erato2(n):
+def get_simple_number_erato(n):
     #Функция прокалывает дырки
     def prokalyvaem_dyrki(arr, n): # передаем масив и простое число
         start_search = n**2
-        for inx,digit in enumerate(arr[start_search::n],n):
-            for inx, digit in enumerate(arr[start_search::n], n):
-                full_inx = arr.index(digit)
-                if arr[full_inx] != 0:  # если он не равен нулю, то
-                    arr[full_inx] = 0
+        for digit in arr[start_search::n]:
+            if digit != 0:  # если он не равен нулю, то
+                arr[digit] = 0
         return arr
 
     lst = []
@@ -54,16 +21,18 @@ def get_simple_number_erato2(n):
     arr.append(0); arr.append(0)   # заполняем первый и второй нулями
     while len(lst) != n:
         arr.append(len(arr))
-        for inx,a in enumerate(arr[2:], 2):
-            if arr[inx] != 0:  # если он не равен нулю, то мы нашли простое число и:
+#        for inx,a in enumerate(arr[2:], 2):
+#            if arr[inx] != 0:  # если он не равен нулю, то мы нашли простое число и:
+#                prokalyvaem_dyrki(arr, a)
+        for a in arr[2:]:
+            if a != 0:  # если он не равен нулю, то мы нашли простое число и:
                 prokalyvaem_dyrki(arr, a)
         lst = [x for x in arr if x != 0]
 
     return lst[-1]
 
 
-
-# Вариант №3
+# Вариант №2
 # Поиск простых чисел не используя алгоритм Решето Эротасфена
 
 def get_simple_number(n):
@@ -81,28 +50,76 @@ def get_simple_number(n):
         i +=2
     return lst[-1]
 
+#####################
+# Результаты
 
+n = int(input("Введите порядковый номер простого числа:"))
 
+num = get_simple_number_erato(n)
+print("Алгоритм Эр. Простое число:", num)
+
+num = get_simple_number(n)
+print("Алгоритм не Эр. Простое число:", num)
+
+#####################
 # Оцениваем алгоритмы
 import timeit
 import cProfile
 
-n = int(input("Введите порядковый номер простого числа:"))
-
+# timeit
 s = """
-num = get_simple_number_erato1(n)
+num = get_simple_number_erato(n)
 """
-#print("Алгоритм Эр.№1. Простое число:", num)
-print(timeit.timeit(s,number=50,globals=globals()))
+print("Время Эр.:", timeit.timeit(s,number=50,globals=globals()))
 
-s = """
-num = get_simple_number_erato2(n)
-"""
-#print("Алгоритм Эр.№2. Простое число:", num)
-print(timeit.timeit(s,number=50,globals=globals()))
 
 s = """
 num = get_simple_number(n)
 """
-#print("Алгоритм не Эр. Простое число:", num)
-print(timeit.timeit(s,number=50,globals=globals()))
+print("Время не Эр.:", timeit.timeit(s,number=50,globals=globals()))
+
+
+########################
+# cProfile
+print("Оценка Эратосвена через cProfile")
+cProfile.run("get_simple_number_erato(n)")
+
+print("Оценка не Эратосвена через cProfile")
+cProfile.run("num = get_simple_number(n)")
+
+# 20ое простое число
+# Эр.: 0.06512603000000006
+#      851    0.001    0.000    0.001    0.000 task02.py:12(prokalyvaem_dyrki)
+
+# Не Эр.: 0.0037111219999999
+#       36    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+#       19    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+
+
+# 70ое простое число
+# Эр.: 1.23841424
+#    13891    0.024    0.000    0.024    0.000 task02.py:12(prokalyvaem_dyrki)
+
+#Не Эр.: 0.024541724999999737
+#      175    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+#       69    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+
+
+# 120ое простое число
+# Эр.: 3.9926523650000005
+#    43511    0.074    0.000    0.074    0.000 task02.py:12(prokalyvaem_dyrki)
+#Не Эр.: 0.05030167399999996
+#      330    0.000    0.000    0.000    0.000 {built-in method builtins.len}
+#      119    0.000    0.000    0.000    0.000 {method 'append' of 'list' objects}
+
+####################################
+####################################
+# Выводы
+# В алгоритме Эратосфена поиск изначально ведется всех составных (не простых чисел) и потом методом исключения
+# этих чисел находим все остальные (т.е. все простые)
+# В алгоритме не Эратосфена поиск ведется сразу простых чисел.
+# Так же алгоритм Эратосфеена адаптирован под поиск всех  простых чисел в определенной
+# последовательности чисел и не адаптирован для ситуации, когда изначально неизвестно какая
+# это будет последовательность натуральных чисел и эта последовательность растет. Поэтому алгоритм
+# пробегает множенство раз по тем натуральным числам, по которых проверка уже проводилась ранее.
+# Алгоритм не Эратосфена не имеет такого недостатка, поэтому показывает значительно лучшие результаты.
